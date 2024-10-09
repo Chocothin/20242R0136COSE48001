@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/sockjs/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h2>WebSocket Connection Test</h2>
+        <button id="connect" class="btn btn-success">Connect</button>
+        <button id="disconnect" class="btn btn-danger" disabled="disabled">Disconnect</button>
+    </div>
+    <div class="row">
+        <input type="text" id="name" placeholder="Enter your name" class="form-control" style="width: 300px; display: inline;">
+        <button id="send" class="btn btn-primary">Send</button>
+    </div>
+    <h2>실시간 녹음 및 번역</h2>
+    <div>
+        <label for="className">수업 이름:</label>
+        <input type="text" id="className" name="className" required>
+    </div>
+    <div>
+        <label for="classContent">수업 내용:</label>
+        <textarea id="classContent" name="classContent" rows="4" cols="50" required></textarea>
+    </div>
+    <button id="startRecording" class="btn btn-success">녹음 시작</button>
+    <button id="stopRecording" class="btn btn-danger" disabled>녹음 중지</button>
+    <div id="translatedMessages"></div>
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Greetings</th>
+            </tr>
+            </thead>
+            <tbody id="greetings"></tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
