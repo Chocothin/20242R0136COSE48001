@@ -15,7 +15,7 @@ spring:
 
   ai:
     openai:
-      api-key: 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
+      api-key: ${OPENAI_API_KEY}
       audio:
         transcription:
           options:
@@ -29,17 +29,3 @@ spring:
 
 server:
   port: 8000
-#
-#openai-service:
-#  api-key: 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
-#  gpt-model: gpt-3.5-turbo
-#  audio-model: whisper-1
-#  http-client:
-#    read-timeout: 3000
-#    connect-timeout: 3000
-#  urls:
-#    base-url: https://api.openai.com/v1
-#    chat-url: /chat/completions
-#    create-transcription-url: /audio/transcriptions
-
-

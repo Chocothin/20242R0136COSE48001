@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenAiConfig{
-    private final String CUSTOM_PROMPT_TEMPLATE = "Please provide an accurate transcription for this audio file. The class is titled '%s', and the key topics covered include: %s. Ensure the transcription reflects any technical terms or important details mentioned.";
     private final String apiKey;
 
     // 생성자 주입을 사용하여 @Value 값을 가져옴
@@ -37,19 +36,15 @@ public class OpenAiConfig{
         return new OpenAiAudioTranscriptionModel(openAiAudioApi, options);
     }
 
-    public OpenAiAudioTranscriptionModel createCustomModel(OpenAiAudioApi openAiAudioApi, String className, String ClassContext) {
-        String customPrompt = String.format(
-                CUSTOM_PROMPT_TEMPLATE,
-                className,
-                ClassContext);
+    public OpenAiAudioTranscriptionModel createCustomModel(OpenAiAudioApi openAiAudioApi) {
 
         OpenAiAudioTranscriptionOptions options = OpenAiAudioTranscriptionOptions.builder()
                 .withLanguage("ko")
-                .withPrompt(customPrompt)
                 .withTemperature(0f)
                 .withResponseFormat(OpenAiAudioApi.TranscriptResponseFormat.TEXT)
                 .withModel("whisper-1")
                 .build();
         return new OpenAiAudioTranscriptionModel(openAiAudioApi, options);
     }
+
 }

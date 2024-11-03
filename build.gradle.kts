@@ -23,6 +23,7 @@ repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/milestone") }
 	maven { url = uri("https://repo.spring.io/snapshot") }
+	maven { url = uri("https://mvn.0110.be/releases") }
 }
 
 dependencyManagement {
@@ -47,6 +48,14 @@ dependencies {
 	implementation("org.springframework:spring-websocket:6.1.12")
 
 	implementation("org.bytedeco:javacv:1.3.1")
+
+	implementation("be.tarsos.dsp:core:2.5")
+	implementation("be.tarsos.dsp:jvm:2.5")
+
+	//jwt
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
 
 
 

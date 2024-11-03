@@ -59,16 +59,78 @@ function disconnect() {
 }
 
 // 오디오 데이터를 청크 단위로 전송하는 함수
-function sendAudioData(audioData, className, classContent) {
+function sendAudioData(audioData, classId) {
     if (stompClient && stompClient.connected) {
         stompClient.send("/app/voice", {}, JSON.stringify({
-                audioData: audioData,
-                className: className,
-            classContent: classContent
+            audioData: audioData,
+            classId: classId
         }));
     } else {
         console.warn('WebSocket이 연결되지 않아 오디오 데이터를 보낼 수 없습니다.');
     }
+}
+
+// 녹음 시작
+function startRecording() {
+    // 수업 ID 가져오기
+    const classId = $("#classId").val();
+
+    if (!classId) {
+        alert("수업 ID를 입력해주세요.");
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            source = audioContext.createMediaStreamSource(stream);
+
+            // ScriptProcessorNode 생성 (4096 버퍼 크기)
+            processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+            source.connect(processor);
+            processor.connect(audioContext.destination);
+
+            processor.onaudioprocess = async function(e) {
+                const inputData = e.inputBuffer.getChannelData(0);
+                const originalSampleRate = audioContext.sampleRate;
+                const targetSampleRate = 16000; // OpenAI API 요구사항
+
+                try {
+                    let resampledData = await resampleBuffer(inputData, originalSampleRate, targetSampleRate);
+
+                    // 16-bit PCM 변환
+                    let pcmData = new Int16Array(resampledData.length);
+                    for (let i = 0; i < resampledData.length; i++) {
+                        let s = Math.max(-1, Math.min(1, resampledData[i]));
+                        pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                    }
+
+                    // Uint8Array으로 변환
+                    let uint8Array = new Uint8Array(pcmData.buffer);
+
+                    // Base64 인코딩
+                    let base64data = arrayBufferToBase64(uint8Array);
+
+                    // 서버로 전송
+                    sendAudioData(base64data, classId);
+                } catch (err) {
+                    console.error('리샘플링 오류:', err);
+                }
+            };
+
+            audioStream = stream;
+
+            console.log("녹음 시작됨");
+
+            // UI 업데이트
+            $("#startRecording").prop("disabled", true);
+            $("#stopRecording").prop("disabled", false);
+        })
+        .catch(function(err) {
+            console.error('마이크 접근 오류:', err);
+            alert('마이크 접근에 실패했습니다: ' + err.message);
+        });
 }
 
 // Resample 함수: 원본 샘플 레이트에서 타겟 샘플 레이트로 변환
@@ -94,69 +156,7 @@ function resampleBuffer(buffer, originalSampleRate, targetSampleRate) {
     }
     return result;
 }
-// 녹음 시작
-function startRecording() {
-    // 수업 정보 가져오기
-    const className = $("#className").val();
-    const classContent = $("#classContent").val();
 
-    if (!className || !classContent) {
-        alert("수업 이름과 내용을 입력해주세요.");
-        return;
-    }
-
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            source = audioContext.createMediaStreamSource(stream);
-
-            // ScriptProcessorNode 생성 (4096 버퍼 크기)
-            processor = audioContext.createScriptProcessor(4096, 1, 1);
-
-            source.connect(processor);
-            processor.connect(audioContext.destination);
-
-            processor.onaudioprocess = async function(e) {
-                const inputData = e.inputBuffer.getChannelData(0);
-                // 원본 샘플 레이트
-                const originalSampleRate = audioContext.sampleRate;
-                const targetSampleRate = 16000; // OpenAI API 요구사항
-                try {
-                    let resampledData = await resampleBuffer(inputData, originalSampleRate, targetSampleRate);
-
-                    // 16-bit PCM 변환
-                    let pcmData = new Int16Array(resampledData.length);
-                    for (let i = 0; i < resampledData.length; i++) {
-                        let s = Math.max(-1, Math.min(1, resampledData[i]));
-                        pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-                    }
-
-                    // Uint8Array으로 변환
-                    let uint8Array = new Uint8Array(pcmData.buffer);
-
-                    // Base64 인코딩
-                    let base64data = arrayBufferToBase64(uint8Array);
-
-                    // 서버로 전송
-                    sendAudioData(base64data, className, classContent);
-                } catch (err) {
-                    console.error('리샘플링 오류:', err);
-                }
-            };
-
-            audioStream = stream;
-
-            console.log("녹음 시작됨");
-
-            // UI 업데이트
-            $("#startRecording").prop("disabled", true);
-            $("#stopRecording").prop("disabled", false);
-        })
-        .catch(function(err) {
-            console.error('마이크 접근 오류:', err);
-            alert('마이크 접근에 실패했습니다: ' + err.message);
-        });
-}
 
 // 녹음 중지
 function stopRecording() {

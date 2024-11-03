@@ -1,35 +1,36 @@
 package com.example.choco_planner.storage.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "recording")
-public class RecordingEntity {
+public class RecordingEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "class_id", nullable = false)
+    private Long classId;
+
     @Column(name = "file_path", nullable = false)
     private String filePath;
 
-    @Column(name = "transcribed_text")
-    private String transcribedText;
+    @Column(name = "transcript")
+    private String transcript;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "recorded_at", nullable = false)
+    private LocalDateTime recordedAt;
 
-    public RecordingEntity() {}
-
-    public RecordingEntity(String filePath, String transcribedText) {
-        this.filePath = filePath;
-        this.transcribedText = transcribedText;
-        this.createdAt = LocalDateTime.now();
-    }
 }
