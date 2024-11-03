@@ -40,6 +40,7 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
+
 	// open ai
 	implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
 	implementation("org.springframework.ai:spring-ai-openai")
