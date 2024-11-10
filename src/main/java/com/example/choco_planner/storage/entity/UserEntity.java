@@ -16,11 +16,9 @@ public class UserEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false, unique = true)
-    private String name;
+    private String email; // 구글 이메일을 username 대신 사용
 
     @Column(nullable = false)
-    private String password;
+    private String name; // 구글 사용자 이름
+
 }

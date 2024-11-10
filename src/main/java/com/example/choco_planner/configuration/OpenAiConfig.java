@@ -1,5 +1,6 @@
 package com.example.choco_planner.configuration;
 
+import com.theokanning.openai.service.OpenAiService;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
@@ -25,6 +26,12 @@ public class OpenAiConfig{
     }
 
     @Bean
+    public OpenAiService openAiService() {
+        return new OpenAiService(apiKey);
+    }
+
+
+    @Bean
     public OpenAiAudioTranscriptionModel transcriptionModel(OpenAiAudioApi openAiAudioApi) {
         OpenAiAudioTranscriptionOptions options = OpenAiAudioTranscriptionOptions.builder()
                 .withLanguage("ko")
@@ -46,5 +53,7 @@ public class OpenAiConfig{
                 .build();
         return new OpenAiAudioTranscriptionModel(openAiAudioApi, options);
     }
+
+
 
 }

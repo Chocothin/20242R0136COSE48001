@@ -24,9 +24,6 @@ public class RecordingEntity extends BaseEntity {
     @Column(name = "class_id", nullable = false)
     private Long classId;
 
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
-
     @Column(name = "transcript")
     private String transcript;
 

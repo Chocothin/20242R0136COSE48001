@@ -20,19 +20,36 @@
         <input type="text" id="name" placeholder="Enter your name" class="form-control" style="width: 300px; display: inline;">
         <button id="send" class="btn btn-primary">Send</button>
     </div>
+
     <h2>실시간 녹음 및 번역</h2>
-    <div>
+
+    <!-- userId와 classId 입력 필드 추가 -->
+    <div class="row">
+        <label for="userId">사용자 ID:</label>
+        <input type="text" id="userId" name="userId" class="form-control" style="width: 300px; display: inline;" required>
+    </div>
+
+    <div class="row">
+        <label for="classId">수업 ID:</label>
+        <input type="text" id="classId" name="classId" class="form-control" style="width: 300px; display: inline;" required>
+    </div>
+
+    <div class="row">
         <label for="className">수업 이름:</label>
-        <input type="text" id="className" name="className" required>
+        <input type="text" id="className" name="className" class="form-control" style="width: 300px; display: inline;" required>
     </div>
-    <div>
+
+    <div class="row">
         <label for="classContent">수업 내용:</label>
-        <textarea id="classContent" name="classContent" rows="4" cols="50" required></textarea>
+        <textarea id="classContent" name="classContent" rows="4" class="form-control" required></textarea>
     </div>
+
     <button id="startRecording" class="btn btn-success">녹음 시작</button>
     <button id="stopRecording" class="btn btn-danger" disabled>녹음 중지</button>
-    <div id="translatedMessages"></div>
-    <div class="row">
+
+    <div id="translatedMessages" class="mt-3"></div>
+
+    <div class="row mt-5">
         <table class="table table-bordered">
             <thead>
             <tr>

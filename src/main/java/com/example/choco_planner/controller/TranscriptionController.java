@@ -3,6 +3,7 @@ package com.example.choco_planner.controller;
 import com.example.choco_planner.common.aop.AuthPrincipal;
 import com.example.choco_planner.common.domain.CustomUser;
 import com.example.choco_planner.controller.dto.request.TranscriptionMessageRequestDTO;
+import com.example.choco_planner.service.RecordingService;
 import com.example.choco_planner.service.SpeechToTextService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -17,17 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class TranscriptionController {
 
     private final SpeechToTextService speechToTextService;
+    private final RecordingService recordingService;
 
-    TranscriptionController(SpeechToTextService speechToTextService) {
+    TranscriptionController(SpeechToTextService speechToTextService, RecordingService recordingService) {
         this.speechToTextService = speechToTextService;
+        this.recordingService = recordingService;
     }
 
     @MessageMapping("/voice")
     @SendTo("/topic/translated")
     public String handleVoiceMessage(
             TranscriptionMessageRequestDTO message,
-            SimpMessageHeaderAccessor headerAccessor,
-            @AuthPrincipal CustomUser customUser
+            SimpMessageHeaderAccessor headerAccessor
     ) {
         try {
             // 세션 ID를 클라이언트 식별자로 사용
@@ -40,7 +42,7 @@ public class TranscriptionController {
                     sessionId,
                     message.getAudioData(),
                     message.getClassId(),
-                    customUser
+                    message.getUserId()
                 );
         } catch (Exception e) {
             e.printStackTrace();

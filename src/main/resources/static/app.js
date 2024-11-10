@@ -59,11 +59,12 @@ function disconnect() {
 }
 
 // 오디오 데이터를 청크 단위로 전송하는 함수
-function sendAudioData(audioData, classId) {
+function sendAudioData(audioData, classId, userId) {
     if (stompClient && stompClient.connected) {
         stompClient.send("/app/voice", {}, JSON.stringify({
             audioData: audioData,
-            classId: classId
+            classId: classId,
+            userId: userId
         }));
     } else {
         console.warn('WebSocket이 연결되지 않아 오디오 데이터를 보낼 수 없습니다.');
@@ -74,9 +75,10 @@ function sendAudioData(audioData, classId) {
 function startRecording() {
     // 수업 ID 가져오기
     const classId = $("#classId").val();
+    const userId = $("#userId").val(); // userId 가져오기
 
-    if (!classId) {
-        alert("수업 ID를 입력해주세요.");
+    if (!classId || !userId) {  // userId 필수 확인
+        alert("수업 ID와 사용자 ID를 입력해주세요.");
         return;
     }
 
@@ -113,7 +115,7 @@ function startRecording() {
                     let base64data = arrayBufferToBase64(uint8Array);
 
                     // 서버로 전송
-                    sendAudioData(base64data, classId);
+                    sendAudioData(base64data, classId, userId);
                 } catch (err) {
                     console.error('리샘플링 오류:', err);
                 }

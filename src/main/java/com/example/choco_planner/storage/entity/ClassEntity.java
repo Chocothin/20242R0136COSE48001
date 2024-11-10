@@ -3,8 +3,6 @@ package com.example.choco_planner.storage.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "classes")
 @Getter

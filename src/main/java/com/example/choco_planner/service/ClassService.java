@@ -23,10 +23,10 @@ public class ClassService {
     @Transactional
     public ClassResponseDTO createClass(
             CreateClassRequestDTO dto,
-            CustomUser customUser
+            Long userId
     ) {
         ClassEntity classEntity = ClassEntity.builder()
-                .userId(customUser.getId())
+                .userId(userId)
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .build();
@@ -52,8 +52,8 @@ public class ClassService {
     }
 
     // 특정 사용자(userId)와 특정 수업(classId) 조회 메서드
-    public Optional<ClassResponseDTO> getClassByUserIdAndClassId(Long userId, Long classId) {
-        return classRepository.findByUserIdAndId(userId, classId)
+    public Optional<ClassResponseDTO> getClassByClassId(Long classId) {
+        return classRepository.findById(classId)
                 .map(ClassResponseDTO::fromEntity);
     }
 }

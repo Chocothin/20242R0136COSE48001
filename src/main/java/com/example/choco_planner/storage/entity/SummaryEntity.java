@@ -1,30 +1,27 @@
 package com.example.choco_planner.storage.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "summary")
-public class SummaryEntity {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class SummaryEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private int userId;
+    private Long userId;
 
-    @Column(name = "recording_id", nullable = false)
-    private int recordingId;
+    @Column(name = "class_id", nullable = false)
+    private Long classId;
 
     @Column(name = "summary_text", nullable = false)
     private String summaryText;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    // Getters and Setters
 }

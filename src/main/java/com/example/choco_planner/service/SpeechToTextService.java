@@ -64,7 +64,7 @@ public class SpeechToTextService {
             String clientId,
             String base64AudioData,
             Long classId,
-            CustomUser customUser
+            Long userId
     ) {
         ClientSession session = clientSessionMap.computeIfAbsent(clientId, k -> new ClientSession());
         session.getLock().lock();
@@ -100,7 +100,7 @@ public class SpeechToTextService {
                         OpenAiAudioTranscriptionModel transcriptionModel = openAiConfig.createCustomModel(openAiAudioApi);
                         String result =  transcriptionModel.call(new AudioTranscriptionPrompt(audioResource)).getResult().getOutput();
                         recordingService.saveRecording(
-                                customUser.getId(),
+                                userId,
                                 classId,
                                 result
                         );
@@ -132,7 +132,7 @@ public class SpeechToTextService {
                             OpenAiAudioTranscriptionModel transcriptionModel = openAiConfig.createCustomModel(openAiAudioApi);
                             String result =  transcriptionModel.call(new AudioTranscriptionPrompt(audioResource)).getResult().getOutput();
                             recordingService.saveRecording(
-                                    customUser.getId(),
+                                    userId,
                                     classId,
                                     result
                             );
