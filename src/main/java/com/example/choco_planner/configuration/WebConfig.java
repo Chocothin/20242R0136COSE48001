@@ -17,7 +17,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOriginPatterns("*")
+                .allowedOrigins(
+                        "http://localhost:8000", // 로컬 Swagger UI
+                        "https://monthly-madge-choco-planner-59fb550a.koyeb.app" // 배포된 Swagger UI
+                )
                 .allowCredentials(true);
     }
 
