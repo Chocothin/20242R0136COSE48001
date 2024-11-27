@@ -1,5 +1,6 @@
 package com.example.choco_planner.controller;
 
+import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
 import com.example.choco_planner.controller.dto.response.RecordingResponseDTO;
 import com.example.choco_planner.service.RecordingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,14 @@ public class RecordingController {
             @PathVariable Long classId
     ) {
         return recordingService.getRecordings(classId);
+    }
+
+    @Operation(summary = "특정 recording의 상세 정보 반환")
+    @GetMapping("/detail/{recordingId}")
+    public RecordingDetailResponseDTO getRecordingDetail(
+            @PathVariable Long recordingId
+    ) {
+        return recordingService.getRecordingDetail(recordingId);
     }
 
 

@@ -3,6 +3,7 @@ package com.example.choco_planner.service;
 import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
 import com.example.choco_planner.storage.entity.QuizEntity;
+import com.example.choco_planner.storage.entity.RecordingDetailEntity;
 import com.example.choco_planner.storage.repository.QuizRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +30,10 @@ public class QuizService {
     }
 
     public List<QuizAndAnswerVO> generateQuiz(Long userId, Long recordingId) {
-        return recordingDetailService.getRecordingDetails(recordingId)
-                .stream().map(RecordingDetailResponseDTO::getTranscript)
+        return recordingService.getRecording(recordingId)
+                .getDetails()
+                .stream()
+                .map(RecordingDetailEntity::getTranscript)
                 .map(openAiTextService::generateQuiz)
                 .map(quiz -> {
                     QuizEntity savedQuiz = saveQuiz(userId, recordingId, quiz);

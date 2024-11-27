@@ -1,6 +1,7 @@
 package com.example.choco_planner.service;
 
 import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
+import com.example.choco_planner.storage.entity.RecordingDetailEntity;
 import com.example.choco_planner.storage.entity.SummaryEntity;
 import com.example.choco_planner.storage.repository.SummaryRepository;
 import org.springframework.stereotype.Service;
@@ -29,9 +30,12 @@ public class SummaryService {
     }
 
     public List<String> generateSummary(Long userId, Long recordingId) {
-        List<String> texts = recordingDetailService.getRecordingDetails(recordingId)
+        List<String> texts = recordingService.getRecording(recordingId)
+                .getDetails()
                 .stream()
-                .map(RecordingDetailResponseDTO::getTranscript)
+                .map(
+                        RecordingDetailEntity::getTranscript
+                )
                 .toList();
         String text = String.join("\n", texts);
         String summary = openAiTextService.generateSummary(text);

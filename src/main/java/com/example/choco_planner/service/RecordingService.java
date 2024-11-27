@@ -1,5 +1,6 @@
 package com.example.choco_planner.service;
 
+import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
 import com.example.choco_planner.controller.dto.response.RecordingResponseDTO;
 import com.example.choco_planner.storage.entity.ClassEntity;
 import com.example.choco_planner.storage.entity.RecordingEntity;
@@ -58,5 +59,24 @@ public class RecordingService {
         // 클래스에 속한 녹음 목록 조회
         List<RecordingEntity> recordingEntities = recordingRepository.findAllByClassEntity_Id(classId);
         return RecordingResponseDTO.fromEntities(recordingEntities);
+    }
+
+    /**
+     * 녹음 ID로 녹음 상세 정보를 조회하는 메서드
+     *
+     * @param recordingId 녹음 ID
+     * @return 녹음 응답 DTO
+     */
+    public RecordingDetailResponseDTO getRecordingDetail(Long recordingId) {
+        // 녹음 ID로 녹음 조회
+        RecordingEntity recordingEntity = recordingRepository.findById(recordingId)
+                .orElseThrow(() -> new IllegalArgumentException("녹음을 찾을 수 없습니다. ID: " + recordingId));
+        return RecordingDetailResponseDTO.fromEntity(recordingEntity);
+    }
+
+    public RecordingEntity getRecording(Long recordingId) {
+        return recordingRepository.findById(recordingId).orElseThrow(
+                () -> new IllegalArgumentException("녹음을 찾을 수 없습니다. ID: " + recordingId)
+        );
     }
 }

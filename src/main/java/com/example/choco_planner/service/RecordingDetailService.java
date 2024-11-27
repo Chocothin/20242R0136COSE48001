@@ -26,9 +26,4 @@ public class RecordingDetailService {
                 .build();
         recordingDetailRepository.save(entity);
     }
-
-    public List<RecordingDetailResponseDTO> getRecordingDetails(Long recordingId){
-        List<RecordingDetailEntity> recordingDetailEntities = recordingDetailRepository.findAllByRecordingId(recordingId);
-        return RecordingDetailResponseDTO.fromEntities(recordingDetailEntities);
-    }
 }
