@@ -7,6 +7,7 @@ import be.tarsos.dsp.SilenceDetector;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import com.example.choco_planner.common.domain.CustomUser;
 import com.example.choco_planner.configuration.OpenAiConfig;
+import com.example.choco_planner.storage.entity.RecordingEntity;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +36,15 @@ public class SpeechToTextService {
     private final OpenAiConfig openAiConfig;
     private final OpenAiAudioApi openAiAudioApi;
     private final RecordingService recordingService;
+    private final RecordingDetailService recordingDetailService;
 
     // 클라이언트별 세션 관리를 위한 맵
     private final ConcurrentHashMap<String, ClientSession> clientSessionMap = new ConcurrentHashMap<>();
 
     // 최소 청크 크기 (예: 32,000 바이트 = 1초 분량의 오디오 데이터)
-    private final int MIN_CHUNK_SIZE = 16000 * 2 * 1 * 30; // 32,000 bytes
+    private final int MIN_CHUNK_SIZE = 16000 * 2 * 1 * 10; // 32,000 bytes
     // 최대 청크 크기 (10초 분량)
-    private final int MAX_CHUNK_SIZE = 16000 * 2 * 1 * 60; // 320,000 bytes (10초)
+    private final int MAX_CHUNK_SIZE = 16000 * 2 * 1 * 20; // 320,000 bytes (10초)
 
     // 오디오 포맷 설정: 16kHz, 16-bit, mono, little endian
     private final AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
@@ -66,9 +68,21 @@ public class SpeechToTextService {
             Long classId,
             Long userId
     ) {
+//        RecordingEntity recording = recordingService.saveRecording(userId, classId);
+
         ClientSession session = clientSessionMap.computeIfAbsent(clientId, k -> new ClientSession());
         session.getLock().lock();
+
         try {
+            final RecordingEntity recording; // recording을 final로 선언
+            if (session.getRecording() == null) {
+                recording = recordingService.saveRecording(userId, classId);
+                session.setRecording(recording);
+            } else {
+                recording = session.getRecording();
+            }
+            recordingService.updateStoppedAt(recording.getId());
+
             byte[] audioBytes = Base64.getDecoder().decode(base64AudioData);
             session.getAccumulatedAudio().write(audioBytes);
 
@@ -99,10 +113,8 @@ public class SpeechToTextService {
                         };
                         OpenAiAudioTranscriptionModel transcriptionModel = openAiConfig.createCustomModel(openAiAudioApi);
                         String result =  transcriptionModel.call(new AudioTranscriptionPrompt(audioResource)).getResult().getOutput();
-                        recordingService.saveRecording(
-                                userId,
-                                classId,
-                                result
+                        recordingDetailService.saveRecordingDetail(
+                                recording, result
                         );
                         return result;
                     } catch (Exception e) {
@@ -131,12 +143,11 @@ public class SpeechToTextService {
                             };
                             OpenAiAudioTranscriptionModel transcriptionModel = openAiConfig.createCustomModel(openAiAudioApi);
                             String result =  transcriptionModel.call(new AudioTranscriptionPrompt(audioResource)).getResult().getOutput();
-                            recordingService.saveRecording(
-                                    userId,
-                                    classId,
-                                    result
+                            recordingDetailService.saveRecordingDetail(
+                                    recording, result
                             );
-                            return result;                        } catch (Exception e) {
+                            return result;
+                        } catch (Exception e) {
                             log.error("[{}] 전사 중 오류 발생 (최대 축적 도달): {}", clientId, e.getMessage());
                             return "전사 중 오류 발생: " + e.getMessage();
                         }
@@ -159,6 +170,7 @@ public class SpeechToTextService {
                 session.getAccumulatedAudio().write(updatedAccumulated);
                 session.setProcessedBytes(0);
             }
+
 
             return transcriptionResult.toString().trim();
 

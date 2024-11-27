@@ -41,11 +41,11 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
 
+
 	// open ai
 	implementation(platform("org.springframework.ai:spring-ai-bom:1.0.0-SNAPSHOT"))
 	implementation("org.springframework.ai:spring-ai-openai")
 	implementation("com.theokanning.openai-gpt3-java:service:0.11.0") // OpenAI Java 클라이언트
-
 
 	// web socket
 	implementation("org.springframework:spring-websocket:6.1.12")

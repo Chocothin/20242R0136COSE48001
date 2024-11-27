@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,13 +22,20 @@ public class RecordingEntity extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "class_id", nullable = false)
-    private Long classId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id", nullable = false)
+    private ClassEntity classEntity;
 
-    @Column(name = "transcript")
-    private String transcript;
+    @Column(name = "recording_title")
+    private String title;
+
+    @OneToMany(mappedBy = "recording", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<RecordingDetailEntity> details;
 
     @Column(name = "recorded_at", nullable = false)
     private LocalDateTime recordedAt;
+
+    @Column(name = "stopped_at")
+    private LocalDateTime stoppedAt;
 
 }

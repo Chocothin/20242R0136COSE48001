@@ -17,21 +17,21 @@ public class SummaryController {
     private final SummaryService summaryService;
 
     @Operation(summary = "recording의 summary를 반환")
-    @PostMapping("/{userId}/{classId}")
+    @PostMapping("/{userId}/{recordingId}")
     public List<String> generateSummary(
             @PathVariable Long userId,
-            @PathVariable Long classId
+            @PathVariable Long recordingId
     ) {
-        return summaryService.generateSummary(userId, classId);
+        return summaryService.generateSummary(userId, recordingId);
     }
 
     @Operation(summary = "class의 summary 조회")
-    @GetMapping("/{userId}/{classId}")
+    @GetMapping("/{userId}/{recordingId}")
     public List<String> getSummary(
             @PathVariable Long userId,
-            @PathVariable Long classId
+            @PathVariable Long recordingId
     ) {
-        return summaryService.getSummary(userId, classId);
+        return summaryService.getSummary(userId, recordingId);
     }
 
 }

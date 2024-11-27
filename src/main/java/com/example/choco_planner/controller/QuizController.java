@@ -23,17 +23,17 @@ public class QuizController {
     @PostMapping("/{userId}/{classId}")
     public List<QuizAndAnswerVO> generateQuiz(
             @PathVariable Long userId,
-            @PathVariable Long classId
+            @PathVariable Long recordingId
     ) {
-        return quizService.generateQuiz(userId, classId);
+        return quizService.generateQuiz(userId, recordingId);
     }
 
     @Operation(summary = "class의 퀴즈 조회")
     @GetMapping("/{userId}/{classId}")
     public List<QuizAndAnswerVO> getQuiz(
             @PathVariable Long userId,
-            @PathVariable Long classId
+            @PathVariable Long recordingId
     ) {
-        return quizService.getQuiz(userId, classId);
+        return quizService.getQuiz(userId, recordingId);
     }
 }

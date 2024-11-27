@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface RecordingRepository extends JpaRepository<RecordingEntity, Long> {
 
-    List<RecordingEntity> findByClassId(Long classId);
+    List<RecordingEntity> findAllByClassEntity_Id(Long classId);
+
+
 }

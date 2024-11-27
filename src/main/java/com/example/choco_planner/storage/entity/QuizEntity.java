@@ -19,8 +19,8 @@ public class QuizEntity extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "class_id", nullable = false)
-    private Long classId;
+    @Column(name = "recording_id", nullable = false)
+    private Long recordingId;
 
     @Column(nullable = false)
     private String quiz;

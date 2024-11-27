@@ -18,8 +18,8 @@ public class SummaryEntity extends BaseEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "class_id", nullable = false)
-    private Long classId;
+    @Column(name = "recording_id", nullable = false)
+    private Long recordingId;
 
     @Column(name = "summary_text", nullable = false)
     private String summaryText;

@@ -1,14 +1,12 @@
 package com.example.choco_planner.service;
 
-import com.example.choco_planner.controller.dto.response.RecordingResponseDTO;
+import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
 import com.example.choco_planner.storage.entity.QuizEntity;
 import com.example.choco_planner.storage.repository.QuizRepository;
-import com.example.choco_planner.storage.repository.SummaryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class QuizService {
@@ -16,27 +14,34 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final OpenAiTextService openAiTextService;
     private final RecordingService recordingService;
+    private final RecordingDetailService recordingDetailService;
 
-    public QuizService(QuizRepository quizRepository, OpenAiTextService openAiTextService, RecordingService recordingService) {
+    public QuizService(
+            QuizRepository quizRepository,
+            OpenAiTextService openAiTextService,
+            RecordingService recordingService,
+            RecordingDetailService recordingDetailService
+    ) {
         this.quizRepository = quizRepository;
         this.openAiTextService = openAiTextService;
         this.recordingService = recordingService;
+        this.recordingDetailService = recordingDetailService;
     }
 
-    public List<QuizAndAnswerVO> generateQuiz(Long userId, Long classId) {
-        return recordingService.getRecordings(classId)
-                .stream().map(RecordingResponseDTO::getTranscript)
+    public List<QuizAndAnswerVO> generateQuiz(Long userId, Long recordingId) {
+        return recordingDetailService.getRecordingDetails(recordingId)
+                .stream().map(RecordingDetailResponseDTO::getTranscript)
                 .map(openAiTextService::generateQuiz)
                 .map(quiz -> {
-                    QuizEntity savedQuiz = saveQuiz(userId, classId, quiz);
+                    QuizEntity savedQuiz = saveQuiz(userId, recordingId, quiz);
                     return new QuizAndAnswerVO(savedQuiz.getId(), quiz.quiz(), quiz.answer());
                 }).toList();
     }
 
 
-    private QuizEntity saveQuiz(Long userId, Long classId, QuizAndAnswerVO quizAndAnswer) {
+    private QuizEntity saveQuiz(Long userId, Long recordingId, QuizAndAnswerVO quizAndAnswer) {
         QuizEntity quizEntity = QuizEntity.builder()
-                .classId(classId)
+                .recordingId(recordingId)
                 .userId(userId)
                 .quiz(quizAndAnswer.quiz())
                 .answer(quizAndAnswer.answer())
@@ -46,8 +51,8 @@ public class QuizService {
 
 
 
-    public List<QuizAndAnswerVO> getQuiz(Long userId, Long classId) {
-        List<QuizEntity> quizEntities = quizRepository.findByClassIdAndUserId(classId,userId);
+    public List<QuizAndAnswerVO> getQuiz(Long userId, Long recordingId) {
+        List<QuizEntity> quizEntities = quizRepository.findByRecordingIdAndUserId(recordingId,userId);
         return quizEntities.stream().map(QuizAndAnswerVO::fromEntity).toList();
     }
 

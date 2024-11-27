@@ -3,6 +3,8 @@ package com.example.choco_planner.storage.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "classes")
 @Getter
@@ -22,5 +24,8 @@ public class ClassEntity extends BaseEntity {
     private String title;
 
     private String description;
+
+    @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<RecordingEntity> recordings; // 1:N 관계 설정
 }
 
