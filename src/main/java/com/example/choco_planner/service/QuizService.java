@@ -1,5 +1,6 @@
 package com.example.choco_planner.service;
 
+import com.example.choco_planner.controller.dto.response.QuizAndAnswerDTO;
 import com.example.choco_planner.controller.dto.response.RecordingDetailResponseDTO;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
 import com.example.choco_planner.storage.entity.QuizEntity;
@@ -29,34 +30,40 @@ public class QuizService {
         this.recordingDetailService = recordingDetailService;
     }
 
-    public List<QuizAndAnswerVO> generateQuiz(Long userId, Long recordingId) {
-        return recordingService.getRecording(recordingId)
+    public List<QuizAndAnswerDTO> generateQuiz(Long userId, Long recordingId) {
+        List<String> texts =  recordingService.getRecording(recordingId)
                 .getDetails()
                 .stream()
                 .map(RecordingDetailEntity::getTranscript)
-                .map(openAiTextService::generateQuiz)
-                .map(quiz -> {
-                    QuizEntity savedQuiz = saveQuiz(userId, recordingId, quiz);
-                    return new QuizAndAnswerVO(savedQuiz.getId(), quiz.quiz(), quiz.answer());
-                }).toList();
+                .toList();
+
+        String text = String.join("\n", texts);
+
+        List<QuizAndAnswerDTO> quizAndAnswers = openAiTextService.generateQuiz(text);
+
+        quizAndAnswers.forEach(quizAndAnswer -> saveQuiz(userId, recordingId, quizAndAnswer));
+
+        return quizAndAnswers;
     }
 
 
-    private QuizEntity saveQuiz(Long userId, Long recordingId, QuizAndAnswerVO quizAndAnswer) {
+    private QuizEntity saveQuiz(Long userId, Long recordingId, QuizAndAnswerDTO quizAndAnswer) {
         QuizEntity quizEntity = QuizEntity.builder()
                 .recordingId(recordingId)
                 .userId(userId)
-                .quiz(quizAndAnswer.quiz())
-                .answer(quizAndAnswer.answer())
+                .quiz(quizAndAnswer.getQuiz())
+                .answer(quizAndAnswer.getAnswer())
                 .build();
         return quizRepository.save(quizEntity);
     }
 
 
 
-    public List<QuizAndAnswerVO> getQuiz(Long userId, Long recordingId) {
+    public List<QuizAndAnswerDTO> getQuiz(Long userId, Long recordingId) {
         List<QuizEntity> quizEntities = quizRepository.findByRecordingIdAndUserId(recordingId,userId);
-        return quizEntities.stream().map(QuizAndAnswerVO::fromEntity).toList();
+        return quizEntities.stream()
+                .map(QuizAndAnswerDTO::fromEntity)
+                .toList();
     }
 
 }

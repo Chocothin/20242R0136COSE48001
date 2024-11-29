@@ -1,8 +1,10 @@
 package com.example.choco_planner.service;
 
+import com.example.choco_planner.controller.dto.response.QuizAndAnswerDTO;
 import com.example.choco_planner.controller.dto.response.SummaryResponse;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class OpenAiTextService {
@@ -78,36 +81,69 @@ public class OpenAiTextService {
         }
         return response;
     }
+    public List<QuizAndAnswerDTO> generateQuiz(String transcript) {
+        ChatMessage chatMessage = new ChatMessage("user",
+                "롤: 주어지는 텍스트들을 보고 퀴즈와 정답 목록을 만들어주는 사람\n" +
+                        "방식: 아래 객체 형식에 맞게 한국어로 퀴즈와 정답 목록을 생성할 것\n" +
+                        "객체 형식:\n" +
+                        "[\n" +
+                        "  {\n" +
+                        "    \"quiz\": \"퀴즈 내용\",\n" +
+                        "    \"answer\": \"정답 내용\"\n" +
+                        "  },\n" +
+                        "  ...\n" +
+                        "]\n" +
+                        "주어진 텍스트:\n" + transcript
+        );
 
+        ChatCompletionRequest request = ChatCompletionRequest.builder()
+                .model("gpt-4o")
+                .messages(List.of(chatMessage))
+                .maxTokens(14000)
+                .temperature(0.7)
+                .build();
 
+        var result = openAiService.createChatCompletion(request);
 
-    public QuizAndAnswerVO generateQuiz(String transcript) {
-//        // Chat API 메시지 작성
-//        ChatMessage message = new ChatMessage("user", "Based on the following text, generate a quiz question and answer in Korean in the format 'Quiz: <question> Answer: <answer>': " + transcript);
-//
-//        ChatCompletionRequest request = ChatCompletionRequest.builder()
-//                .messages(Collections.singletonList(message))
-//                .model("gpt-4")
-//                .maxTokens(100)
-//                .temperature(0.7)
-//                .build();
-//
-//        // Chat API 호출
-//        ChatCompletionResponse response = openAiService.createChatCompletion(request);
-//
-//        String content = response.getChoices().get(0).getMessage().getContent().trim();
-//
-//        // "Quiz:"와 "Answer:"로 분리
-//        String quiz = "";
-//        String answer = "";
-//        String[] parts = content.split("Answer:");
-//        if (parts.length == 2) {
-//            quiz = parts[0].replace("Quiz:", "").trim();
-//            answer = parts[1].trim();
-//        } else {
-//            throw new IllegalArgumentException("Response format is incorrect: " + content);
-//        }
+        String rawResponse = result.getChoices().get(0).getMessage().getContent();
 
-        return new QuizAndAnswerVO(null, "quiz", "answer");
+        // Markdown 제거
+        String cleanedResponse = cleanMarkdown(rawResponse);
+
+        // JSON 파싱
+        return parseQuizAndAnswer(cleanedResponse);
     }
+
+    private String cleanMarkdown(String response) {
+        if (response.startsWith("```")) {
+            int start = response.indexOf("["); // 배열 시작 위치
+            int end = response.lastIndexOf("]"); // 배열 종료 위치
+            if (start != -1 && end != -1) {
+                return response.substring(start, end + 1).trim();
+            }
+        }
+        return response.trim(); // Markdown이 없으면 원본 반환
+    }
+
+    private List<QuizAndAnswerDTO> parseQuizAndAnswer(String jsonResponse) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            // JSON 문자열을 List<QuizAndAnswerDTO>로 변환
+            return objectMapper.readValue(jsonResponse,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, QuizAndAnswerDTO.class));
+        } catch (MismatchedInputException e) {
+            // 단일 객체를 리스트로 변환
+            try {
+                QuizAndAnswerDTO singleQuiz = objectMapper.readValue(jsonResponse, QuizAndAnswerDTO.class);
+                return List.of(singleQuiz);
+            } catch (Exception innerException) {
+                throw new RuntimeException("QuizAndAnswerDTO 변환 실패", innerException);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("QuizAndAnswerDTO 변환 실패", e);
+        }
+    }
+
 }

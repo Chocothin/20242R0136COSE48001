@@ -1,5 +1,6 @@
 package com.example.choco_planner.controller;
 
+import com.example.choco_planner.controller.dto.response.QuizAndAnswerDTO;
 import com.example.choco_planner.service.QuizService;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,8 +21,8 @@ public class QuizController {
     }
 
     @Operation(summary = "recording의 퀴즈 생성")
-    @PostMapping("/{userId}/{classId}")
-    public List<QuizAndAnswerVO> generateQuiz(
+    @PostMapping("/{userId}/{recordingId}")
+    public List<QuizAndAnswerDTO> generateQuiz(
             @PathVariable Long userId,
             @PathVariable Long recordingId
     ) {
@@ -29,8 +30,8 @@ public class QuizController {
     }
 
     @Operation(summary = "class의 퀴즈 조회")
-    @GetMapping("/{userId}/{classId}")
-    public List<QuizAndAnswerVO> getQuiz(
+    @GetMapping("/{userId}/{recordingId}")
+    public List<QuizAndAnswerDTO> getQuiz(
             @PathVariable Long userId,
             @PathVariable Long recordingId
     ) {
