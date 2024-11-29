@@ -1,5 +1,6 @@
 package com.example.choco_planner.controller;
 
+import com.example.choco_planner.controller.dto.response.SummaryResponse;
 import com.example.choco_planner.service.SummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,7 @@ public class SummaryController {
 
     @Operation(summary = "recording의 summary를 반환")
     @PostMapping("/{userId}/{recordingId}")
-    public List<String> generateSummary(
+    public SummaryResponse generateSummary(
             @PathVariable Long userId,
             @PathVariable Long recordingId
     ) {
@@ -27,7 +28,7 @@ public class SummaryController {
 
     @Operation(summary = "class의 summary 조회")
     @GetMapping("/{userId}/{recordingId}")
-    public List<String> getSummary(
+    public SummaryResponse getSummary(
             @PathVariable Long userId,
             @PathVariable Long recordingId
     ) {

@@ -1,6 +1,8 @@
 package com.example.choco_planner.service;
 
+import com.example.choco_planner.controller.dto.response.SummaryResponse;
 import com.example.choco_planner.service.vo.response.QuizAndAnswerVO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -19,10 +21,29 @@ public class OpenAiTextService {
         this.openAiService = openAiService;
     }
 
-    public String generateSummary(String transcript) {
-        ChatMessage message = new ChatMessage("user", "롤: 주어지는 텍스트들을 보고 요약을 해주는 사람\n" +
-                "                방식: 대제목, 중제목, 소제목 3단계로 나누어서 한국어로 요약할 것\n" +
-                "                주어진 텍스트:\n" + transcript);
+
+
+    public SummaryResponse generateSummary(String transcript) {
+        // OpenAI 요청 생성
+        ChatMessage message = new ChatMessage("user",
+                "롤: 주어지는 텍스트들을 보고 요약을 해주는 사람\n" +
+                        "방식: 아래 객체 형식에 맞게 한국어로 요약할 것\n" +
+                        "객체 형식:\n" +
+                        "{\n" +
+                        "  \"response\": [\n" +
+                        "    {\n" +
+                        "      \"title\": \"대제목\",\n" +
+                        "      \"sections\": [\n" +
+                        "        {\n" +
+                        "          \"subtitle\": \"중제목\",\n" +
+                        "          \"contents\": [\"소제목1\", \"소제목2\", ...]\n" +
+                        "        }\n" +
+                        "      ]\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}\n" +
+                        "주어진 텍스트:\n" + transcript
+        );
 
         ChatCompletionRequest request = ChatCompletionRequest.builder()
                 .model("gpt-4o")
@@ -31,10 +52,34 @@ public class OpenAiTextService {
                 .temperature(0.7)
                 .build();
 
-        // 요청 보내기
+        // OpenAI 요청 보내기
         var result = openAiService.createChatCompletion(request);
-        return result.getChoices().get(0).getMessage().getContent().trim();
+
+        // 응답 데이터 가져오기
+        String rawResponse = result.getChoices().get(0).getMessage().getContent().trim();
+
+        // 응답에서 Markdown 코드 블록 제거
+        String cleanedResponse = removeMarkdownCodeBlock(rawResponse);
+
+        // JSON을 객체로 매핑
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(cleanedResponse, SummaryResponse.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("JSON 매핑 실패: " + cleanedResponse);
+        }
     }
+
+    private String removeMarkdownCodeBlock(String response) {
+        // Markdown 코드 블록 제거
+        if (response.startsWith("```json")) {
+            return response.substring(response.indexOf("{"), response.lastIndexOf("}") + 1).trim();
+        }
+        return response;
+    }
+
+
 
     public QuizAndAnswerVO generateQuiz(String transcript) {
 //        // Chat API 메시지 작성

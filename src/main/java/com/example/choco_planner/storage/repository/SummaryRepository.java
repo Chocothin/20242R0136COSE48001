@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface SummaryRepository extends JpaRepository<SummaryEntity, Integer> {
 
-    List<SummaryEntity> findByRecordingIdAndUserId(Long recordingId, Long userId);
+    SummaryEntity findFirstByRecordingIdAndUserIdOrderByIdDesc(Long recordingId, Long userId);
 }
