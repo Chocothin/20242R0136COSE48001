@@ -19,7 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedOrigins(
                         "http://localhost:8000", // 로컬 Swagger UI
-                        "https://monthly-madge-choco-planner-59fb550a.koyeb.app" // 배포된 Swagger UI
+                        "https://monthly-madge-choco-planner-59fb550a.koyeb.app", // 배포된 Swagger UI
+                        "http://localhost:5173" // 프론트엔드 개발 서버
+
                 )
                 .allowCredentials(true);
     }
