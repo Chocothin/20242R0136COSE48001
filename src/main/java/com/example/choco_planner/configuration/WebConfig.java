@@ -7,27 +7,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-//    private final AuthPrincipalArgumentResolver authPrincipalArgumentResolver;
-
-//    public WebConfig(AuthPrincipalArgumentResolver authPrincipalArgumentResolver) {
-//        this.authPrincipalArgumentResolver = authPrincipalArgumentResolver;
-//    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOrigins(
-                        "http://localhost:8000", // 로컬 Swagger UI
-                        "https://monthly-madge-choco-planner-59fb550a.koyeb.app", // 배포된 Swagger UI
-                        "http://localhost:5173" // 프론트엔드 개발 서버
-
-                )
-                .allowCredentials(true);
+                .allowedMethods("*") // 모든 HTTP 메서드 허용
+                .allowedOrigins("*") // 모든 Origin 허용
+                .allowCredentials(false); // 자격 증명(Credentials) 사용하지 않음
     }
 
-//    @Override
-//    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-//        resolvers.add(authPrincipalArgumentResolver);
-//    }
 }

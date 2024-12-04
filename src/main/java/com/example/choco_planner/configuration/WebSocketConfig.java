@@ -6,6 +6,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -20,9 +21,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/gs-guide-websocket")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .addInterceptors(new HttpSessionHandshakeInterceptor()) // HTTP 세션 전달
+                .setAllowedOriginPatterns("*") // 모든 Origin 허용
+                .withSockJS(); // SockJS 사용
     }
+
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
