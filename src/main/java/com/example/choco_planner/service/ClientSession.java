@@ -29,12 +29,12 @@ public class ClientSession {
     }
 
     /**
-     * 세션 상태를 초기화합니다.
+     * 세션 상태를 초기화합니다. (RecordingEntity는 초기화하지 않음)
      */
     public void resetAccumulatedAudio() {
-        this.accumulatedAudio.reset();
-        this.startTime = null;
-        this.processedBytes = 0;
-        this.recording = null; // RecordingEntity도 초기화
+        this.accumulatedAudio.reset(); // 누적된 오디오 데이터만 초기화
+        this.startTime = null; // 시작 시간 초기화
+        this.processedBytes = 0; // 처리된 바이트 수 초기화
+        // recording 필드는 유지
     }
 }

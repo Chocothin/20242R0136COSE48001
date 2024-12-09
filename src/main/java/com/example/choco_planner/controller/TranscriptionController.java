@@ -1,8 +1,7 @@
 package com.example.choco_planner.controller;
 
-import com.example.choco_planner.common.aop.AuthPrincipal;
-import com.example.choco_planner.common.domain.CustomUser;
 import com.example.choco_planner.controller.dto.request.TranscriptionMessageRequestDTO;
+import com.example.choco_planner.service.RealTimeSTTService;
 import com.example.choco_planner.service.RecordingService;
 import com.example.choco_planner.service.SpeechToTextService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,10 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/transcription")
 public class TranscriptionController {
 
+    private final RealTimeSTTService realTimeSTTService;
     private final SpeechToTextService speechToTextService;
     private final RecordingService recordingService;
 
-    TranscriptionController(SpeechToTextService speechToTextService, RecordingService recordingService) {
+    public TranscriptionController(RealTimeSTTService realTimeSTTService, SpeechToTextService speechToTextService, RecordingService recordingService) {
+        this.realTimeSTTService = realTimeSTTService;
         this.speechToTextService = speechToTextService;
         this.recordingService = recordingService;
     }
@@ -43,10 +44,10 @@ public class TranscriptionController {
                     message.getAudioData(),
                     message.getClassId(),
                     message.getUserId()
-                );
+            );
         } catch (Exception e) {
             e.printStackTrace();
-            return "오디오 처리 중 오류 발생: " + e.getMessage();
         }
+        return null;
     }
 }

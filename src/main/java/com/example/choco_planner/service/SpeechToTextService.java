@@ -74,13 +74,19 @@ public class SpeechToTextService {
         session.getLock().lock();
 
         try {
-            final RecordingEntity recording; // recording을 final로 선언
+            // recording이 이미 세션에 존재하는 경우 중복 저장 방지
             if (session.getRecording() == null) {
-                recording = recordingService.saveRecording(userId, classId);
-                session.setRecording(recording);
-            } else {
-                recording = session.getRecording();
+                synchronized (session) {
+                    if (session.getRecording() == null) { // Double-checked locking으로 중복 방지
+                        RecordingEntity recording = recordingService.saveRecording(userId, classId);
+                        session.setRecording(recording); // 세션에 recording 저장
+                        log.info("[{}] 새로운 recording 생성: {}", clientId, recording.getId());
+                    }
+                }
             }
+
+            // recording은 항상 세션에서 가져옵니다
+            RecordingEntity recording = session.getRecording();
             recordingService.updateStoppedAt(recording.getId());
 
             byte[] audioBytes = Base64.getDecoder().decode(base64AudioData);

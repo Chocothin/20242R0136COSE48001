@@ -49,6 +49,7 @@ dependencies {
 
 	// web socket
 	implementation("org.springframework:spring-websocket:6.1.12")
+	implementation("org.java-websocket:Java-WebSocket:1.5.7")
 
 	implementation("org.bytedeco:javacv:1.3.1")
 

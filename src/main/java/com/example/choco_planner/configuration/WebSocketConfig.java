@@ -21,9 +21,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/gs-guide-websocket")
-                .addInterceptors(new HttpSessionHandshakeInterceptor()) // HTTP 세션 전달
                 .setAllowedOriginPatterns("*") // 모든 Origin 허용
-                .withSockJS(); // SockJS 사용
+                .withSockJS();
     }
 
 
