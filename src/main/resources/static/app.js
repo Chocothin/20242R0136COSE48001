@@ -31,7 +31,7 @@ function setConnected(connected) {
 
 // WebSocket 연결
 function connect() {
-    var socket = new SockJS('http://localhost:8000/gs-guide-websocket');
+    var socket = new SockJS('https://monthly-madge-choco-planner-59fb550a.koyeb.app/gs-guide-websocket');
     console.log("WebSocket 연결 시도 중...");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
